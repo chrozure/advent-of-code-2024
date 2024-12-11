@@ -19,6 +19,7 @@ public class Day11 {
             String data = reader.nextLine();
             String[] stonesStr = data.split(" ");
 
+            // Stone number -> frequency mapping
             Map<Long, Long> stones = new HashMap<>();
             for (String stone : stonesStr) {
                 stones.put(Long.parseLong(stone), 1l);
@@ -30,9 +31,12 @@ public class Day11 {
                     Long stone = entry.getKey();
                     Long freq = entry.getValue();
 
+                    // Stone has number 0
                     if (stone == 0) {
                         newStones.put(1l, freq + newStones.getOrDefault(1l, 0l));
-                    } else if (String.valueOf(stone).length() % 2 == 0) {
+                    }
+                    // Stone has number with even number of digits
+                    else if (String.valueOf(stone).length() % 2 == 0) {
                         String stoneStr = String.valueOf(stone);
                         int middleOfStone = stoneStr.length() / 2;
                         long firstHalf = Long.parseLong(stoneStr.substring(0, middleOfStone));
@@ -40,7 +44,9 @@ public class Day11 {
 
                         newStones.put(firstHalf, freq + newStones.getOrDefault(firstHalf, 0l));
                         newStones.put(secondHalf, freq + newStones.getOrDefault(secondHalf, 0l));
-                    } else {
+                    }
+                    // None of the other rules apply
+                    else {
                         long newVal = stone * 2024;
                         newStones.put(newVal, freq + newStones.getOrDefault(newVal, 0l));
                     }
