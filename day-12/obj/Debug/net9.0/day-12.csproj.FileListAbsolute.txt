@@ -1,0 +1,15 @@
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/bin/Debug/net9.0/day-12
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/bin/Debug/net9.0/day-12.deps.json
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/bin/Debug/net9.0/day-12.runtimeconfig.json
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/bin/Debug/net9.0/day-12.dll
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/bin/Debug/net9.0/day-12.pdb
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/day-12.GeneratedMSBuildEditorConfig.editorconfig
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/day-12.AssemblyInfoInputs.cache
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/day-12.AssemblyInfo.cs
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/day-12.csproj.CoreCompileInputs.cache
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/day-12.sourcelink.json
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/day-12.dll
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/refint/day-12.dll
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/day-12.pdb
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/day-12.genruntimeconfig.cache
+/Users/harryzhang/Documents/Programming/advent-of-code-2024/day-12/obj/Debug/net9.0/ref/day-12.dll
