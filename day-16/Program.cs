@@ -67,10 +67,9 @@ class Program
             var pq = new PriorityQueue<(int, int, int), int>();
             pq.Enqueue((startRow, startCol, RIGHT), 0);
 
-
+            // Dijkstra's algorithm
             while (pq.TryDequeue(out (int row, int col, int direction) coordinate, out int distance)) {
-                Console.WriteLine(coordinate.row + " " + coordinate.col + " " + distance);
-                dist[coordinate.row][coordinate.col] = distance;
+                dist[coordinate.row][coordinate.col] = Math.Min(distance, dist[coordinate.row][coordinate.col]);
 
                 // found end
                 if (coordinate.row == endRow && coordinate.col == endCol) {
@@ -91,62 +90,57 @@ class Program
                     if (map[coordinate.row + 1][coordinate.col] != WALL && distance + 1001 <= dist[coordinate.row + 1][coordinate.col]) {
                         pq.Enqueue((coordinate.row + 1, coordinate.col, DOWN), distance + 1001);
                     }
-                    // left
-                    if (map[coordinate.row][coordinate.col - 1] != WALL && distance + 2001 <= dist[coordinate.row][coordinate.col - 1]) {
-                        pq.Enqueue((coordinate.row, coordinate.col - 1, LEFT), distance + 2001);
-                    }
                 }
 
                 else if (coordinate.direction == UP) {
-                    if (map[coordinate.row][coordinate.col + 1] != WALL && distance + 1001 <= dist[coordinate.row][coordinate.col + 1]) {
-                        pq.Enqueue((coordinate.row, coordinate.col + 1, RIGHT), distance + 1001);
-                    }
+                    // up
                     if (map[coordinate.row - 1][coordinate.col] != WALL && distance + 1 <= dist[coordinate.row - 1][coordinate.col]) {
                         pq.Enqueue((coordinate.row - 1, coordinate.col, UP), distance + 1);
                     }
-                    if (map[coordinate.row + 1][coordinate.col] != WALL && distance + 2001 <= dist[coordinate.row + 1][coordinate.col]) {
-                        pq.Enqueue((coordinate.row + 1, coordinate.col, DOWN), distance + 2001);
-                    }
+                    // left
                     if (map[coordinate.row][coordinate.col - 1] != WALL && distance + 1001 <= dist[coordinate.row][coordinate.col - 1]) {
                         pq.Enqueue((coordinate.row, coordinate.col - 1, LEFT), distance + 1001);
+                    }
+                    // right
+                    if (map[coordinate.row][coordinate.col + 1] != WALL && distance + 1001 <= dist[coordinate.row][coordinate.col + 1]) {
+                        pq.Enqueue((coordinate.row, coordinate.col + 1, RIGHT), distance + 1001);
                     }
                 }
 
                 else if (coordinate.direction == LEFT) {
-                    if (map[coordinate.row][coordinate.col + 1] != WALL && distance + 2001 <= dist[coordinate.row][coordinate.col + 1]) {
-                        pq.Enqueue((coordinate.row, coordinate.col + 1, RIGHT), distance + 2001);
+                    // left
+                    if (map[coordinate.row][coordinate.col - 1] != WALL && distance + 1 <= dist[coordinate.row][coordinate.col - 1]) {
+                        pq.Enqueue((coordinate.row, coordinate.col - 1, LEFT), distance + 1);
                     }
+                    // up
                     if (map[coordinate.row - 1][coordinate.col] != WALL && distance + 1001 <= dist[coordinate.row - 1][coordinate.col]) {
                         pq.Enqueue((coordinate.row - 1, coordinate.col, UP), distance + 1001);
                     }
+                    // down
                     if (map[coordinate.row + 1][coordinate.col] != WALL && distance + 1001 <= dist[coordinate.row + 1][coordinate.col]) {
                         pq.Enqueue((coordinate.row + 1, coordinate.col, DOWN), distance + 1001);
-                    }
-                    if (map[coordinate.row][coordinate.col - 1] != WALL && distance + 1 <= dist[coordinate.row][coordinate.col - 1]) {
-                        pq.Enqueue((coordinate.row, coordinate.col - 1, LEFT), distance + 1);
                     }
                 }
 
                 else if (coordinate.direction == DOWN) {
-                    if (map[coordinate.row][coordinate.col + 1] != WALL && distance + 1001 <= dist[coordinate.row][coordinate.col + 1]) {
-                        pq.Enqueue((coordinate.row, coordinate.col + 1, RIGHT), distance + 1001);
-                    }
-                    if (map[coordinate.row - 1][coordinate.col] != WALL && distance + 2001 <= dist[coordinate.row - 1][coordinate.col]) {
-                        pq.Enqueue((coordinate.row - 1, coordinate.col, UP), distance + 2001);
-                    }
+                    // down
                     if (map[coordinate.row + 1][coordinate.col] != WALL && distance + 1 <= dist[coordinate.row + 1][coordinate.col]) {
                         pq.Enqueue((coordinate.row + 1, coordinate.col, DOWN), distance + 1);
                     }
+                    // left
                     if (map[coordinate.row][coordinate.col - 1] != WALL && distance + 1001 <= dist[coordinate.row][coordinate.col - 1]) {
                         pq.Enqueue((coordinate.row, coordinate.col - 1, LEFT), distance + 1001);
+                    }
+                    // right
+                    if (map[coordinate.row][coordinate.col + 1] != WALL && distance + 1001 <= dist[coordinate.row][coordinate.col + 1]) {
+                        pq.Enqueue((coordinate.row, coordinate.col + 1, RIGHT), distance + 1001);
                     }
                 }
             }
 
-            // 521 too low
-            // 5021 too high
-            // var tiles = DFS(endRow, endCol, startRow, startCol, pred);
-            // Console.WriteLine(tiles.Count);
+            // Part 2
+            var tiles = DFS(endRow, endCol, startRow, startCol, dist);
+            Console.WriteLine("Part 2: " + tiles.Count);
         }
         catch (Exception e)
         {
@@ -154,16 +148,56 @@ class Program
         }
     }
 
-    private static HashSet<(int, int)> DFS(int row, int col, int startRow, int startCol, Dictionary<(int, int), List<(int, int)>> pred) {
+    private static readonly int SIZE = 141;
+
+    // Part 2
+    // Reverse DFS
+    // Returns a set containing all the tiles that are part of at least one best path
+    private static HashSet<(int, int)> DFS(int row, int col, int startRow, int startCol, List<List<int>> dist) {
         HashSet<(int, int)> s = [];
         s.Add((row, col));
+        // Reached start position
         if (row == startRow && col == startCol) {
             return s;
         }
 
-        foreach ((int r, int c) in pred[(row, col)]) {
-            s.Add((r, c));
-            s.UnionWith(DFS(r, c, startRow, startCol, pred));
+        int curDistance = dist[row][col];
+
+        // For each direction:
+        //  Check if the neighbour has a change of 1
+        //      In this case, do a DFS on it since it would have been a predecessor
+        //  If the distance is 1001, then check the position right after as well
+        //      This is because there could have been a turn in the middle
+        int down = dist[row + 1][col];
+        if (down == curDistance - 1 || down == curDistance - 1001) {
+            s.UnionWith(DFS(row + 1, col, startRow, startCol, dist));
+        }
+        if (down == curDistance - 1001 && row < SIZE - 2 && dist[row + 2][col] == curDistance - 2) {
+            s.UnionWith(DFS(row + 2, col, startRow, startCol, dist));
+        }
+
+        int left = dist[row][col - 1];
+        if (left == curDistance - 1 || left == curDistance - 1001) {
+            s.UnionWith(DFS(row, col - 1, startRow, startCol, dist));
+        }
+        if (left == curDistance - 1001 && col > 1 && dist[row][col - 2] == curDistance - 2) {
+            s.UnionWith(DFS(row, col - 2, startRow, startCol, dist));
+        }
+
+        int up = dist[row - 1][col];
+        if (up == curDistance - 1 || up == curDistance - 1001) {
+            s.UnionWith(DFS(row - 1, col, startRow, startCol, dist));
+        }
+        if (up == curDistance - 1001 && row > 1 && dist[row - 2][col] == curDistance - 2) {
+            s.UnionWith(DFS(row - 2, col, startRow, startCol, dist));
+        }
+
+        int right = dist[row][col + 1];
+        if (right == curDistance - 1 || right == curDistance - 1001) {
+            s.UnionWith(DFS(row, col + 1, startRow, startCol, dist));
+        }
+        if (right == curDistance - 1001 && col < SIZE - 2 && dist[row][col + 2] == curDistance - 2) {
+            s.UnionWith(DFS(row, col + 2, startRow, startCol, dist));
         }
 
         return s;
