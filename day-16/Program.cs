@@ -148,8 +148,6 @@ class Program
         }
     }
 
-    private static readonly int SIZE = 141;
-
     // Part 2
     // Reverse DFS
     // Returns a set containing all the tiles that are part of at least one best path
@@ -172,7 +170,7 @@ class Program
         if (down == curDistance - 1 || down == curDistance - 1001) {
             s.UnionWith(DFS(row + 1, col, startRow, startCol, dist));
         }
-        if (down == curDistance - 1001 && row < SIZE - 2 && dist[row + 2][col] == curDistance - 2) {
+        if (down == curDistance - 1001 && dist[row + 2][col] == curDistance - 2) {
             s.UnionWith(DFS(row + 2, col, startRow, startCol, dist));
         }
 
@@ -180,7 +178,7 @@ class Program
         if (left == curDistance - 1 || left == curDistance - 1001) {
             s.UnionWith(DFS(row, col - 1, startRow, startCol, dist));
         }
-        if (left == curDistance - 1001 && col > 1 && dist[row][col - 2] == curDistance - 2) {
+        if (left == curDistance - 1001 && dist[row][col - 2] == curDistance - 2) {
             s.UnionWith(DFS(row, col - 2, startRow, startCol, dist));
         }
 
@@ -188,7 +186,7 @@ class Program
         if (up == curDistance - 1 || up == curDistance - 1001) {
             s.UnionWith(DFS(row - 1, col, startRow, startCol, dist));
         }
-        if (up == curDistance - 1001 && row > 1 && dist[row - 2][col] == curDistance - 2) {
+        if (up == curDistance - 1001 && dist[row - 2][col] == curDistance - 2) {
             s.UnionWith(DFS(row - 2, col, startRow, startCol, dist));
         }
 
@@ -196,7 +194,7 @@ class Program
         if (right == curDistance - 1 || right == curDistance - 1001) {
             s.UnionWith(DFS(row, col + 1, startRow, startCol, dist));
         }
-        if (right == curDistance - 1001 && col < SIZE - 2 && dist[row][col + 2] == curDistance - 2) {
+        if (right == curDistance - 1001 && dist[row][col + 2] == curDistance - 2) {
             s.UnionWith(DFS(row, col + 2, startRow, startCol, dist));
         }
 
