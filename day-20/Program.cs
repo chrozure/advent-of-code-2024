@@ -19,6 +19,8 @@ class Program
             using StreamReader sr = new("./day-20.in");
 
             List<List<int>> map = [];
+            List<List<int>> dist = [];
+            List<List<(int, int)>> pred = [];
 
             string? line;
             int startRow = 0, startCol = 0, endRow = 0, endCol = 0;
@@ -26,6 +28,9 @@ class Program
             while ((line = sr.ReadLine()) != null)
             {
                 List<int> mapRow = [];
+                List<int> distRow = [];
+                List<(int, int)> predRow = [];
+
                 for (int j = 0; j < line.Length; j++)
                 {
                     char c = line[j];
@@ -44,36 +49,35 @@ class Program
                             endCol = j;
                         }
                     }
+
+                    distRow.Add(INF);
+                    predRow.Add((-1, -1));
                 }
 
                 map.Add(mapRow);
+                dist.Add(distRow);
+                pred.Add(predRow);
                 lineNo++;
             }
 
-            // PrintMap(map);
 
             // 9476 steps required in normal map
-            int numStepsRequired = BFS(startRow, startCol, endRow, endCol, map);
-            Console.WriteLine("Number of steps in normal map: " +numStepsRequired);
+            int numStepsRequired = BFS(startRow, startCol, endRow, endCol, map, dist, pred);
+            Console.WriteLine("Number of steps in path: " + numStepsRequired);
 
-            // For this part we will turn each wall into a track individually
-            // and then run a BFS and see if the time taken is shorter
             int numValidCheats = 0;
-            for (int i = 0; i < SIZE; i++) {
-                for (int j = 0; j < SIZE; j++) {
-                    if (map[i][j] != WALL) continue;
-
-                    map[i][j] = TRACK;
-                    int numSteps = BFS(startRow, startCol, endRow, endCol, map);
-
-                    if (numSteps <= numStepsRequired - 100) {
-                        numValidCheats++;
-                    }
-                    map[i][j] = WALL;
-                }
+            for ((int row, int col) backtrack = (endRow, endCol); backtrack != (-1, -1); backtrack = pred[backtrack.row][backtrack.col])
+            {
+                numValidCheats += FindCheats(backtrack.row, backtrack.col, 2, 100, dist);
             }
-
             Console.WriteLine("Part 1: " + numValidCheats);
+
+            numValidCheats = 0;
+            for ((int row, int col) backtrack = (endRow, endCol); backtrack != (-1, -1); backtrack = pred[backtrack.row][backtrack.col])
+            {
+                numValidCheats += FindCheats(backtrack.row, backtrack.col, 20, 100, dist);
+            }
+            Console.WriteLine("Part 2: " + numValidCheats);
         }
         catch (Exception e)
         {
@@ -81,9 +85,13 @@ class Program
         }
     }
 
-    private static int BFS(int startRow, int startCol, int endRow, int endCol, List<List<int>> map) {
+    // Run a breadth first search from the start to the finish
+    // Returns the length of the path from the start to finish
+    // Sets the values in each co-ordinate in dist to the distnace until the finish
+    // and the predecessor as the predecessor for each position
+    private static int BFS(int startRow, int startCol, int endRow, int endCol,
+                        List<List<int>> map, List<List<int>> dist, List<List<(int, int)>> pred) {
         List<List<bool>> visited = [];
-        List<List<(int, int)>> pred = [];
 
         for (int i = 0; i < SIZE; i++) {
             List<bool> visitedRow = [];
@@ -94,7 +102,6 @@ class Program
             }
 
             visited.Add(visitedRow);
-            pred.Add(predRow);
         }
 
         Queue<(int, int)> q = new([(startRow, startCol)]);
@@ -119,30 +126,40 @@ class Program
             }
         }
 
+        // backtrack from end
         int numSteps = 0;
-        for ((int, int) backtrack = (endRow, endCol); backtrack != (startRow, startCol); backtrack = pred[backtrack.Item1][backtrack.Item2])
+        for ((int row, int col) backtrack = (endRow, endCol); backtrack != (-1, -1); backtrack = pred[backtrack.row][backtrack.col])
         {
+            dist[backtrack.row][backtrack.col] = numSteps;
             numSteps++;
         }
 
-        return numSteps;
+        return numSteps - 1;
+    }
+
+    private static int FindCheats(int row, int col, int distance, int timeSave, List<List<int>> dist)
+    {
+
+        int numCheats = 0;
+
+        for (int i = -distance; i <= distance; i++)
+        {
+            for (int j = -distance + Math.Abs(i); j <= distance - Math.Abs(i); j++)
+            {
+                int posRow = row + i;
+                int posCol = col + j;
+
+                if (ValidPosition(posRow, posCol) && dist[row][col] - dist[posRow][posCol] - Math.Abs(i) - Math.Abs(j) >= timeSave)
+                {
+                    numCheats++;
+                }
+            }
+        }
+
+        return numCheats;
     }
 
     private static bool ValidPosition(int row, int col) {
         return row >= 0 && col >= 0 && row < SIZE && col < SIZE;
-    }
-
-    private static void PrintMap(List<List<int>> map) {
-        for (int i = 0; i < map.Count; i++) {
-            for (int j = 0; j < map[0].Count; j++) {
-                if (map[i][j] == WALL) {
-                    Console.Write("#");
-                } else if (map[i][j] == TRACK) {
-                    Console.Write(".");
-                }
-            }
-
-            Console.WriteLine();
-        }
     }
 }
